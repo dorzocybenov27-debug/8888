@@ -1,2 +1,1 @@
-# octagon-exampleы
-# octagon-exampleы
+# octagon-example
