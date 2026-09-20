@@ -1,29 +1,17 @@
-from app.db.db import SessionLocal
-from app.db import crud
+from fastapi import FastAPI
+from app.db.db import engine, Base
+from app.api import categories, books
 
-def main():
-    db = SessionLocal()
-    try:
-        print("=== ПОЛУЧЕНИЕ ДАННЫХ ИЗ БАЗЫ ДАННЫХ ===\n")
-        
-        # Читаем все категории
-        categories = crud.get_categories(db)
-        
-        for category in categories:
-            print(f"Категория: {category.title} (ID: {category.id})")
-            print("-" * 40)
-            
-            # Фильтруем книги, которые относятся к этой категории
-            for book in category.books:
-                print(f"  • Книга: \"{book.title}\"")
-                print(f"    Цена: {book.price} руб.")
-                print(f"    Описание: {book.description}")
-                print()
-                
-    except Exception as e:
-        print(f"Ошибка при чтении данных: {e}")
-    finally:
-        db.close()
+# Создаем таблицы в БД автоматически при запуске сервера
+Base.metadata.create_all(bind=engine)
 
-if __name__ == "__main__":
-    main()
+app = FastAPI(title="Bookstore REST API", version="1.0.0")
+
+# Подключаем роутеры модулей
+app.include_router(categories.router)
+app.include_router(books.router)
+
+# Шаг 8: Эндпоинт проверки работоспособности
+@app.get("/health", tags=["Health"])
+def health_check():
+    return {"status": "healthy", "database": "connected"}
