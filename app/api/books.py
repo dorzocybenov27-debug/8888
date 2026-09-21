@@ -18,7 +18,7 @@ def read_books(category_id: Optional[int] = None, db: Session = Depends(get_db))
 def create_book(book: schemas.BookCreate, db: Session = Depends(get_db)):
     if not crud.get_category_by_id(db, book.category_id):
         raise HTTPException(status_code=400, detail="Category not found")
-    return crud.create_book(db, title=book.title, price=book.price, category_id=book.category_id, description=book.description, url=book.url)
+    return crud.create_book(db, **book.model_dump())
 
 @router.put("/{book_id}", response_model=schemas.Book)
 def update_book(book_id: int, book_data: schemas.BookUpdate, db: Session = Depends(get_db)):

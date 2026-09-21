@@ -24,3 +24,9 @@ def delete_category(category_id: int, db: Session = Depends(get_db)):
     if not crud.delete_category(db, category_id):
         raise HTTPException(status_code=404, detail="Category not found")
     return {"message": "Category and its books deleted successfully"}
+@router.put("/{category_id}", response_model=schemas.Category)
+def update_category(category_id: int, category_data: schemas.CategoryUpdate, db: Session = Depends(get_db)):
+    db_category = crud.update_category(db, category_id=category_id, new_title=category_data.title)
+    if not db_category:
+        raise HTTPException(status_code=404, detail="Category not found")
+    return db_category
